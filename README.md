@@ -1,4 +1,5 @@
-<img width="658" height="720" alt="EliteSys_Manager_v1 9" src="https://github.com/user-attachments/assets/0c77d6d5-24c8-4974-9a96-bc7142a97ab8" />
+<img width="658" height="720" alt="EliteSys_Manager_v1 9" src="https://github.com/user-attachments/assets/baf85a14-e3ff-4cb1-9965-09ca26c8fd67" />
+
 
  🛠️ EliteSys Manager
 
