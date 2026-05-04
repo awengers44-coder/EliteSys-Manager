@@ -1,3 +1,5 @@
+<img width="658" height="720" alt="EliteSys_Manager_v1 9" src="https://github.com/user-attachments/assets/0c77d6d5-24c8-4974-9a96-bc7142a97ab8" />
+
  🛠️ EliteSys Manager
 
 Windows sistemler için geliştirilmiş, otomatik kontrol ve yönetim işlemleri sunan gelişmiş bir komut dosyasıdır.
