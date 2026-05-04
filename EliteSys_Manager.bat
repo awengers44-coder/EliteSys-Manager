@@ -245,9 +245,21 @@ if exist "%temp%\getadmin.vbs" ( Del "%temp%\getadmin.vbs" )
 goto ana_menu
 
 :Microsoft_Store_App
-curl -L --fail --retry 3 "https://raw.githubusercontent.com/awengers44-coder/Microsoft_Store_App_Manager.cmd/main/Microsoft_Store_App_Manager.cmd" -o "%USERPROFILE%\Desktop\Microsoft_Store_App_Manager.cmd" && start "" "%USERPROFILE%\Desktop\Microsoft_Store_App_Manager.cmd"
-echo [] Microsoft Store App Manager.cmd Masa üstüne indirilip çalıştırılacak..
-echo [] Lütfen bekleyiniz..
+set "URL=https://raw.githubusercontent.com/awengers44-coder/Microsoft_Store_App_Manager.cmd/main/Microsoft_Store_App_Manager.cmd"
+set "OUT=%USERPROFILE%\Desktop\Microsoft_Store_App_Manager.cmd"
+
+echo Microsoft Store App Manager indiriliyor...
+curl -L --fail --retry 3 "%URL%" -o "%OUT%"
+
+if not exist "%OUT%" (
+    echo Indirme başarısız oldu.
+    pause
+    goto ana_menu
+)
+
+start "" "%OUT%"
+echo  Microsoft Store App Manager.cmd Masa üstüne indirilip çalıştırılacak..
+echo  Lütfen bekleyiniz..
 timeout /t 5 >nul
 goto ana_menu
 
