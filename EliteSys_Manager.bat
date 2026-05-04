@@ -109,11 +109,12 @@ echo ║ [33]  BIOS Boot Menüsü                [34]  Rufus - WinToGo USB Oluş
 echo ║ [35]  Windows\Office365 ve MultiBoot  [36]  Browser/Tarayıcı Yönetimi 
 echo ║ [37]  Başlangıç Programlarını Yönet   [38]  Runtimes Kurulumları          
 echo ║ [39]  Uzaktan Yönetim Araçları        [40]  Ücretsiz Yararlı Programlar
+echo ║ [41]  Microsoft Store App Manager        
 echo ╚════════════════════════════════════════════════════════════════════════════════╝
 
 :ana_menu_islem
 set "secim="
-set /p "secim=        Seciminiz [0-40]: "
+set /p "secim=        Seciminiz [0-41]: "
 if not defined secim goto ana_menu_hata
 set "secim=!secim: =!"
 for /f "delims=0123456789" %%A in ("!secim!") do goto ana_menu_hata
@@ -125,13 +126,13 @@ if "!secim:~0,1!"=="0" if not "!secim!"=="0" (
 set "secim_no=0"
 set /a "secim_no=!secim!" >nul 2>&1
 if !secim_no! LSS 0 goto ana_menu_hata
-if !secim_no! GTR 40 goto ana_menu_hata
+if !secim_no! GTR 41 goto ana_menu_hata
 if "!secim_no!"=="0" goto cmd_kapat
 goto ana_menu_secim_!secim_no!
 
 :ana_menu_hata
 echo.
-echo        [HATA] Lutfen 0 ile 40 arasinda yalnizca sayi girin.
+echo        [HATA] Lutfen 0 ile 41 arasinda yalnizca sayi girin.
 timeout /t 2 /nobreak >nul
 goto ana_menu
 
@@ -215,6 +216,8 @@ goto runtime_menu
 goto remote_tools_menu
 :ana_menu_secim_40
 goto free_software_menu
+:ana_menu_secim_41
+goto Microsoft_Store_App
 
 goto ana_menu
 
@@ -239,6 +242,13 @@ goto ana_menu
 :hosts_
 if exist "%temp%\getadmin.vbs" ( Del "%temp%\getadmin.vbs" )
 %WinDir%\system32\notepad.exe %WinDir%\system32\drivers\etc\hosts
+goto ana_menu
+
+:Microsoft_Store_App
+curl -L --fail --retry 3 "https://raw.githubusercontent.com/awengers44-coder/Microsoft_Store_App_Manager.cmd/main/Microsoft_Store_App_Manager.cmd" -o "%USERPROFILE%\Desktop\Microsoft_Store_App_Manager.cmd" && start "" "%USERPROFILE%\Desktop\Microsoft_Store_App_Manager.cmd"
+echo [] Microsoft Store App Manager.cmd Masa üstüne indirilip çalıştırılacak..
+echo [] Lütfen bekleyiniz..
+timeout /t 5 >nul
 goto ana_menu
 
 :wifi_sifreleri
