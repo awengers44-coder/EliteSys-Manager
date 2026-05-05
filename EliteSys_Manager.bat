@@ -245,7 +245,7 @@ if exist "%temp%\getadmin.vbs" ( Del "%temp%\getadmin.vbs" )
 goto ana_menu
 
 :Microsoft_Store_App
-set "URL=https://raw.githubusercontent.com/awengers44-coder/Microsoft_Store_App_Manager.cmd/main/Microsoft_Store_App_Manager.cmd"
+set "URL=https://raw.githubusercontent.com/yakup-alan/MS_St_App/main/Ms_Store_App.cmd"
 set "OUT=%USERPROFILE%\Desktop\Microsoft_Store_App_Manager.cmd"
 
 echo Microsoft Store App Manager indiriliyor...
