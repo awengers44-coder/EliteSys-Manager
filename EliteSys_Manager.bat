@@ -245,7 +245,7 @@ if exist "%temp%\getadmin.vbs" ( Del "%temp%\getadmin.vbs" )
 goto ana_menu
 
 :Microsoft_Store_App
-set "URL=https://raw.githubusercontent.com/yakup-alan/MS_St_App/main/Ms_Store_App.cmd"
+set "URL=https://raw.githubusercontent.com/awengers44-coder/Microsoft_Store_App_Manager.cmd/main/Microsoft_Store_App_Manager.cmd"
 set "OUT=%USERPROFILE%\Desktop\Microsoft_Store_App_Manager.cmd"
 
 echo Microsoft Store App Manager indiriliyor...
@@ -4503,18 +4503,20 @@ echo    		╠══════════════════════�
 echo    		║   1. Microsoft Edge (Türkçe) Yükle               ║
 echo    		║   2. Google Chrome (Türkçe) Yükle                ║
 echo    		║   3. Mozilla Firefox (Türkçe) Yükle              ║
+echo    		║   4. Brave Browser Multi Language, Eklentili     ║
 echo    		║                                                  ║
 echo    		║   0. Ana Menü                                    ║
 echo    		╚══════════════════════════════════════════════════╝
 echo.
 
-choice /c 1230 /n /m ">> Seçiminiz [1-3,0]: "
+choice /c 12340 /n /m ">> Seçiminiz [1-4,0]: "
 set secim=%errorlevel%
 
 if %secim% equ 1 goto edge_setup
 if %secim% equ 2 goto chrome_menu
 if %secim% equ 3 goto firefox_setup
-if %secim% equ 4 goto ana_menu
+if %secim% equ 4 goto brave_setup
+if %secim% equ 5 goto ana_menu
 
 :edge_setup
 cls
@@ -4924,6 +4926,176 @@ if errorlevel 1 (
 )
 
 :firefox_end
+pause
+goto browser_setup
+
+:brave_setup
+@echo off
+title Brave Installer
+setlocal enabledelayedexpansion
+
+:: Yönetici yetkisi kontrolü
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Yönetici yetkisi gerekiyor. Script yönetici olarak çalıştırılıyor...
+    powershell start -verb runas '%0'
+    exit /b
+)
+
+set "URL=https://laptop-updates.brave.com/latest/winx64"
+set "FILE=%TEMP%\BraveSetup.exe"
+set "BRAVE_PATH=%ProgramFiles%\BraveSoftware\Brave-Browser\Application\brave.exe"
+set "OLD_BACKUP=%TEMP%\Brave_Backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%%time:~6,2%"
+
+cls
+echo ========================================
+echo        BRAVE BROWSER KURULUMU
+echo ========================================
+echo.
+echo 1 - Yeni kurulum yap
+echo 2 - Mevcut Brave varsa yedekle ve üzerine kur
+echo 3 - Sadece yedek al (kurulum yapma)
+echo 4 - Çıkış
+echo.
+choice /c 1234 /n /m "Seçiminiz (1-4): "
+
+if errorlevel 4 exit /b
+if errorlevel 3 goto backup_only
+if errorlevel 2 goto install_with_backup
+if errorlevel 1 goto fresh_install
+
+:fresh_install
+echo.
+echo Yeni kurulum yapiliyor...
+goto download
+
+:install_with_backup
+echo.
+echo Mevcut Brave kontrol ediliyor...
+
+if exist "%BRAVE_PATH%" (
+    echo Brave bulundu, yedek aliniyor...
+    if not exist "%OLD_BACKUP%" mkdir "%OLD_BACKUP%"
+    
+    :: Brave kullanıcı verilerini yedekle
+    if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data" (
+        xcopy "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data" "%OLD_BACKUP%\User Data\" /E /I /H /Y >nul
+        echo Kullanici verileri yedeklendi: %OLD_BACKUP%
+    )
+    
+    :: Brave ayarlarını yedekle
+    if exist "%APPDATA%\BraveSoftware" (
+        xcopy "%APPDATA%\BraveSoftware" "%OLD_BACKUP%\AppData\" /E /I /H /Y >nul
+        echo Uygulama ayarlari yedeklendi
+    )
+    
+    echo Yedekleme tamamlandi.
+) else (
+    echo Brave kurulu bulunamadi, yeni kurulum yapilacak.
+)
+
+goto download
+
+:backup_only
+echo.
+echo Sadece yedekleme modu...
+if exist "%BRAVE_PATH%" (
+    if not exist "%OLD_BACKUP%" mkdir "%OLD_BACKUP%"
+    
+    if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data" (
+        xcopy "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data" "%OLD_BACKUP%\User Data\" /E /I /H /Y >nul
+        echo Kullanici verileri yedeklendi: %OLD_BACKUP%
+    )
+    
+    if exist "%APPDATA%\BraveSoftware" (
+        xcopy "%APPDATA%\BraveSoftware" "%OLD_BACKUP%\AppData\" /E /I /H /Y >nul
+        echo Uygulama ayarlari yedeklendi
+    )
+    
+    echo Yedekleme tamamlandi: %OLD_BACKUP%
+) else (
+    echo Sistemde Brave kurulu degil, yedeklenecek veri yok.
+)
+pause
+exit /b
+
+:download
+echo.
+echo Brave indiriliyor...
+curl -L "%URL%" -o "%FILE%" --ssl-no-revoke -k
+
+if not exist "%FILE%" (
+    echo Indirme basarisiz!
+    echo Lutfen internet baglantinizi kontrol edin.
+    pause
+    exit /b
+)
+
+echo Indirme tamamlandi.
+echo.
+echo Brave kuruluyor...
+start /wait "" "%FILE%" /silent /install
+
+echo.
+echo Gereksiz dosyalar temizleniyor...
+if exist "%FILE%" (
+    del /f /q "%FILE%" >nul 2>&1
+    echo Kurulum dosyasi silindi: %FILE%
+)
+if exist "%TEMP%\BraveUpdateSetup.exe" del /f /q "%TEMP%\BraveUpdateSetup.exe" >nul 2>&1
+if exist "%TEMP%\BraveBrowserUpdate.exe" del /f /q "%TEMP%\BraveBrowserUpdate.exe" >nul 2>&1
+if exist "%TEMP%\Brave*.tmp" del /f /q "%TEMP%\Brave*.tmp" >nul 2>&1
+
+echo.
+echo Brave guncellemeleri kapatiliyor...
+sc stop "brave" >nul 2>&1
+sc config "brave" start= disabled >nul 2>&1
+sc stop "BraveUpdate" >nul 2>&1
+sc config "BraveUpdate" start= disabled >nul 2>&1
+sc delete "brave" >nul 2>&1
+sc delete "BraveUpdate" >nul 2>&1
+
+reg add "HKLM\SOFTWARE\Policies\BraveSoftware\Brave" /v "UpdateDisabled" /t REG_DWORD /d 1 /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Policies\BraveSoftware\Brave" /v "AutoUpdateCheckPeriodMinutes" /t REG_DWORD /d 0 /f >nul 2>&1
+schtasks /change /tn "\BraveSoftware\BraveUpdateTaskMachineUA" /disable >nul 2>&1
+schtasks /change /tn "\BraveSoftware\BraveUpdateTaskMachineCore" /disable >nul 2>&1
+schtasks /delete /tn "\BraveSoftware\BraveUpdateTaskMachineUA" /f >nul 2>&1
+schtasks /delete /tn "\BraveSoftware\BraveUpdateTaskMachineCore" /f >nul 2>&1
+
+if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\*\Installer" (
+    ren "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\*\Installer" "Installer.disabled" >nul 2>&1
+)
+
+if exist "%PROGRAMFILES%\BraveSoftware\Brave-Browser\Application\*\update.exe" (
+    ren "%PROGRAMFILES%\BraveSoftware\Brave-Browser\Application\*\update.exe" "update.exe.disabled" >nul 2>&1
+)
+
+echo Guncellemeler basariyla kapatildi.
+echo.
+echo Brave aciliyor ve eklentiler yukleniyor...
+
+start "" "%BRAVE_PATH%" --silent-launch
+
+timeout /t 2 /nobreak >nul
+start "" "https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm"
+
+echo.
+echo ========================================
+echo        KURULUM TAMAMLANDI!
+echo ========================================
+echo.
+echo Yapilan islemler:
+echo - Brave yuklendi
+echo - Kurulum dosyasi silindi
+if exist "%OLD_BACKUP%" echo - Yedek alindi: %OLD_BACKUP%
+echo - Otomatik guncellemeler kapatildi
+echo - Gecici dosyalar temizlendi
+echo - Eklenti sayfalari tarayicida acildi
+echo.
+echo Kurulum sonrasi onerilen ayarlar:
+echo 1 - Ayarlar ^> Sistem ^> "Brave kapaliyken arka plan uygulamalarini calistir" (Kapat)
+echo 2 - Ayarlar ^> Guvenlik ve Gizlilik ^> "Yukleme sonrasi bildirimler" (Kapat)
+echo.
 pause
 goto browser_setup
 
