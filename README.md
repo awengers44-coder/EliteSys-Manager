@@ -29,7 +29,7 @@ Windows sistemler için geliştirilmiş, otomatik kontrol ve yönetim işlemleri
 Aşağıdaki komutu çalıştırarak script'i masaüstüne indirebilirsiniz:
 
 ```bat
-curl -L -o %USERPROFILE%\Desktop\EliteSys_Manager.bat https://raw.githubusercontent.com/awengers44-coder/EliteSys-Manager/main/EliteSys_Manager.bat
+curl -L -o %USERPROFILE%\Desktop\EliteSys_Manager.bat https://raw.githubusercontent.com/yakup-alan/EliteSys-Manager/main/EliteSys_Manager.bat
 ```
 
 ---
@@ -53,8 +53,8 @@ curl -L -o %USERPROFILE%\Desktop\EliteSys_Manager.bat https://raw.githubusercont
 ---
  👤 Geliştirici
 
-* GitHub: https://github.com/awengers44-coder
-* Proje: https://github.com/awengers44-coder/EliteSys-Manager
+* GitHub: https://github.com/yakup-alan
+* Proje: https://github.com/yakup-alan/EliteSys-Manager
 ---
 ## 📌 Sorumluluk Reddi
 
@@ -63,7 +63,7 @@ Bu araç eğitim ve sistem yönetimi amaçlıdır. Kullanım sonucu oluşabilece
 ## 🚀 Hızlı Kurulum (Tek Satır)
 
 ```bat
-curl -L https://raw.githubusercontent.com/awengers44-coder/EliteSys-Manager/main/EliteSys_Manager.bat -o %USERPROFILE%\Desktop\EliteSys_Manager.bat && start %USERPROFILE%\Desktop\EliteSys_Manager.bat
+curl -L https://raw.githubusercontent.com/yakup-alan/EliteSys-Manager/main/EliteSys_Manager.bat -o %USERPROFILE%\Desktop\EliteSys_Manager.bat && start %USERPROFILE%\Desktop\EliteSys_Manager.bat
 ```
 
 ---
