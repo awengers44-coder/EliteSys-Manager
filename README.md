@@ -50,11 +50,7 @@ curl -L -o %USERPROFILE%\Desktop\EliteSys_Manager.bat https://raw.githubusercont
 * Script yalnızca **Windows 10/11 x64** sistemlerde çalışır
 * Yönetici yetkisi olmadan çalışmaz (otomatik yükseltir)
 * Güvenlik açısından script içeriğini incelemeniz önerilir
----
- 👤 Geliştirici
 
-* GitHub: https://github.com/yakup-alan
-* Proje: https://github.com/yakup-alan/EliteSy
 ---
 ## 📌 Sorumluluk Reddi
 
