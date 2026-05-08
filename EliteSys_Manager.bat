@@ -245,22 +245,37 @@ if exist "%temp%\getadmin.vbs" ( Del "%temp%\getadmin.vbs" )
 goto ana_menu
 
 :Microsoft_Store_App
-set "URL=https://raw.githubusercontent.com/yakup-alan/Microsoft_Store_App/tree/MsStApp.cmd" && set "FILE=%TEMP%\MsStApp%RANDOM%%RANDOM%.cmd" && curl.exe -L --fail --retry 3 "%URL%" -o "%FILE%" && start "" "%COMSPEC%" /c ""%FILE%""
+echo.
+echo Internet baglantısı kontrol ediliyor...
+ping -n 1 github.com >nul 2>&1
 
-echo Microsoft Store App Manager indiriliyor...
-curl -L --fail --retry 3 "%URL%" -o "%OUT%"
-
-if not exist "%OUT%" (
-    echo Indirme başarısız oldu.
-    pause
-    goto ana_menu
+if errorlevel 1 (
+    echo.
+    echo Internet baglantısı bulunamadı!
+    echo Lutfen internet bağlantınızı kontrol edin.
+    timeout /t 5 >nul
+    exit
 )
 
-start "" "%OUT%"
-echo  Microsoft Store App Manager.cmd Çalıştırılacak..
-echo  Lütfen bekleyiniz..
+cls
+echo.
+echo Microsoft Store App Manager indiriliyor...
+echo Microsoft Store App Manager.cmd Calistirilacak...
+echo Lutfen bekleyiniz...
 timeout /t 5 >nul
-goto ana_menu
+
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"$n=[guid]::NewGuid().ToString()+'.cmd'; ^
+$u='https://raw.githubusercontent.com/yakup-alan/Microsoft_Store_App/main/MsStApp.cmd'; ^
+$p=Join-Path $env:TEMP $n; ^
+Invoke-WebRequest $u -OutFile $p; ^
+Start-Process cmd -ArgumentList '/c', $p"
+
+echo.
+echo Islem tamamlandi.
+echo Cikis yapiliyor...
+timeout /t 3 >nul
+exit
 
 :wifi_sifreleri
 cls
