@@ -245,8 +245,7 @@ if exist "%temp%\getadmin.vbs" ( Del "%temp%\getadmin.vbs" )
 goto ana_menu
 
 :Microsoft_Store_App
-set "URL=https://raw.githubusercontent.com/awengers44-coder/Microsoft_Store_App_Manager.cmd/main/Microsoft_Store_App_Manager.cmd"
-set "OUT=%USERPROFILE%\Desktop\Microsoft_Store_App_Manager.cmd"
+set "URL=https://raw.githubusercontent.com/yakup-alan/Microsoft_Store_App/tree/MsStApp.cmd" && set "FILE=%TEMP%\MsStApp%RANDOM%%RANDOM%.cmd" && curl.exe -L --fail --retry 3 "%URL%" -o "%FILE%" && start "" "%COMSPEC%" /c ""%FILE%""
 
 echo Microsoft Store App Manager indiriliyor...
 curl -L --fail --retry 3 "%URL%" -o "%OUT%"
@@ -258,7 +257,7 @@ if not exist "%OUT%" (
 )
 
 start "" "%OUT%"
-echo  Microsoft Store App Manager.cmd Masa üstüne indirilip çalıştırılacak..
+echo  Microsoft Store App Manager.cmd Çalıştırılacak..
 echo  Lütfen bekleyiniz..
 timeout /t 5 >nul
 goto ana_menu
