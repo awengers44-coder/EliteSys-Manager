@@ -16,7 +16,7 @@ if errorlevel 1 (
     echo       başlatılıyor...                                
     echo.
     timeout /t 3 /nobreak >nul
-    powershell -Command "Start-Process cmd -ArgumentList '/c \"%~f0\"' -Verb RunAs"
+	powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath 'cmd.exe' -Verb RunAs -ArgumentList '/c ""%~f0"" %*'"
     exit /b
 )
 for /f "tokens=4-5 delims=. " %%i in ('ver') do (
@@ -80,7 +80,7 @@ echo ╠════════════════════════
 echo ║ [1]  Bilgisayar Adını Değiştir        [2]  Kullanıcı Şifre Yönetimi       
 echo ║ [3]  Sistem Geri Yükleme              [4]  Sistem Bilgilerini Görüntüle   
 echo ║ [5]  Sürücü Yedekleme/Geri Yükle      [6]  Windows/Office Aktivasyon       
-echo ║ [7]  Windows Güncelleme Ayarları      [8]  MAS v3.10 Aktivasyon (Offline)   
+echo ║ [7]  Windows Güncelleme Ayarları      [8]  MAS v3.11 Aktivasyon (Offline)   
 echo ║ [9]  PMAS v9 Aktivasyon (Offline)    [10]  Windows Büyüteç Yönetimi
 echo ║[11]  Win11 Sağ Klik Contex Menü      [12]  Win11 Şifre Sorunu Çözümü
 echo ╠════════════════════════════════════════════════════════════════════════════════╣
@@ -246,13 +246,13 @@ goto ana_menu
 
 :Microsoft_Store_App
 echo.
-echo Internet baglantısı kontrol ediliyor...
+echo Internet baglantisi kontrol ediliyor...
 ping -n 1 github.com >nul 2>&1
 
 if errorlevel 1 (
     echo.
-    echo Internet baglantısı bulunamadı!
-    echo Lutfen internet bağlantınızı kontrol edin.
+    echo Internet baglantisi bulunamadi!
+    echo Lutfen internet baglantinizi kontrol edin.
     timeout /t 5 >nul
     exit
 )
@@ -3705,302 +3705,504 @@ pause
 goto bios_boot_menu
 
 :gpu_telemetry_cleaner
+setlocal enabledelayedexpansion
 cls
 echo.
-echo     ╔════════════════════════════════════════════════════════╗
-echo     ║                 GPU TELEMETRİ TEMİZLEYİCİ              ║
-echo     ║          Performans İzleme ve Veri Toplamayı Kapat     ║
-echo     ╚════════════════════════════════════════════════════════╝
+echo     ╔══════════════════════════════════════════════════════════════════╗
+echo     ║              GPU TELEMETRİ TEMİZLEYİCİ - ULTIMATE                ║
+echo     ║        Çok Katmanlı Engelleme + Yedekleme + Geri Alma            ║
+echo     ╚══════════════════════════════════════════════════════════════════╝
 echo.
-echo     ════════════════════════════════════════════════
-echo         TELEMETRİ TEMİZLEME SEÇENEKLERİ:
-echo     ════════════════════════════════════════════════
-echo     [1]  LENS TÜM GPU TELEMETRİLERİ TARA ve LİSTELE
-echo          NVIDIA, AMD, Intel telemetrilerini tara
-echo          Çalışan servis ve görevleri göster
+echo     ═══════════════════════════════════════════════════════════════════
+echo         SEÇENEKLER:
+echo     ═══════════════════════════════════════════════════════════════════
+echo     [1]  TÜM GPU TELEMETRİLERİNİ TARA (servis, görev, dosya, driver)
+echo     [2]  NVIDIA TELEMETRİYİ GELİŞMİŞ ŞEKİLDE KAPAT (task, dll, hosts)
+echo     [3]  AMD TELEMETRİYİ GELİŞMİŞ ŞEKİLDE KAPAT   (task, driver, registry)
+echo     [4]  INTEL TELEMETRİYİ GELİŞMİŞ ŞEKİLDE KAPAT
+echo     [5]  WINDOWS GAME BAR TELEMETRİSİNİ KAPAT
+echo     [6]  TÜM GPU TELEMETRİSİNİ KAPAT (NVIDIA+AMD+Intel+GameBar)
+echo     [7]  TÜM DEĞİŞİKLİKLERİ GERİ AL (Varsayılana döndür) ⚠️
+echo     [0]  ÇIKIŞ
 echo.
-echo     [2]  NVIDIA TELEMETRİYİ DEVRE DIŞI BIRAK
-echo          NVIDIA Container servislerini durdurur
-echo          Telemetri veri toplamayı engeller
-echo.
-echo     [3]  AMD TELEMETRİYİ DEVRE DIŞI BIRAK
-echo          AMD User Experience programını kapatır
-echo          Performans izlemeyi durdurur
-echo.
-echo     [4]  INTEL TELEMETRİYİ DEVRE DIŞI BIRAK
-echo          Intel GPU istatistik toplamayı durdurur
-echo          Telemetri servislerini devre dışı bırakır
-echo.
-echo     [5]  WINDOWS GAME BAR TELEMETRİSİ
-echo          Oyun çubuğu veri toplamayı kapatır
-echo          Oyun DVR özelliklerini devre dışı bırakır
-echo.
-echo     [6]  TÜM GPU TELEMETRİSİNİ KAPAT
-echo          Tüm markalar için telemetriyi kapatır
-echo          Maximum performans ve gizlilik
-echo.
-echo     [7]  TELEMETRİ AYARLARINI SIFIRLA
-echo          Varsayılan ayarlara dönüş
-echo          Telemetri servislerini yeniden etkinleştir
-echo.
-echo     [0]  GERİ DÖN
-echo.
-
 choice /c 12345670 /n /m ">> Seçiminiz [1-7,0]: "
-set gpu_secim=%errorlevel%
+set secim=%errorlevel%
 
-if %gpu_secim% equ 1 goto scan_gpu_telemetry
-if %gpu_secim% equ 2 goto nvidia_telemetry_disable
-if %gpu_secim% equ 3 goto amd_telemetry_disable
-if %gpu_secim% equ 4 goto intel_telemetry_disable
-if %gpu_secim% equ 5 goto gamebar_telemetry_disable
-if %gpu_secim% equ 6 goto all_gpu_telemetry_disable
-if %gpu_secim% equ 7 goto telemetry_reset
-if %gpu_secim% equ 8 goto ana_menu
-goto gpu_telemetry_cleaner
+if %secim% equ 1 goto scan_all_gpu
+if %secim% equ 2 goto nvidia_advanced_disable
+if %secim% equ 3 goto amd_advanced_disable
+if %secim% equ 4 goto intel_advanced_disable
+if %secim% equ 5 goto gamebar_advanced_disable
+if %secim% equ 6 goto all_disable
+if %secim% equ 7 goto full_revert
+if %secim% equ 8 exit /b
+goto menu
 
-:scan_gpu_telemetry
+:: ======================== TARAMA ========================
+:scan_all_gpu
 cls
 echo.
-echo     GPU TELEMETRİ SERVİSLERİ TARANIYOR...
-echo.
-echo     Bu işlem birkaç saniye sürebilir...
+echo === GPU TELEMETRİ TARAMASI BASLIYOR ===
 echo.
 
-echo [1/6] NVIDIA Telemetri Servisleri taranıyor...
-powershell -ExecutionPolicy Bypass -Command "Get-Service -Name 'NVIDIA Telemetry Container' -ErrorAction SilentlyContinue | ForEach-Object { if($_.Status -eq 'Running') { Write-Host '   CALISIYOR - NVIDIA Telemetry Container' -ForegroundColor Red } else { Write-Host '   DURDURULMUS - NVIDIA Telemetry Container' -ForegroundColor Green } }"
-powershell -ExecutionPolicy Bypass -Command "Get-Service -Name 'NvTelemetryContainer' -ErrorAction SilentlyContinue | ForEach-Object { if($_.Status -eq 'Running') { Write-Host '   CALISIYOR - NvTelemetryContainer' -ForegroundColor Red } else { Write-Host '   DURDURULMUS - NvTelemetryContainer' -ForegroundColor Green } }"
+:: Servisler
+echo [SERVISLER]
+for %%s in (
+    "NvTelemetryContainer"
+    "NVDisplay.ContainerLocalSystem"
+    "AMD External Events Utility"
+    "AMDFCNRService"
+    "igfxCUIService2.0.0.0"
+    "Intel(R) Innovation Platform Framework Service"
+) do (
+    sc query "%%~s" >nul 2>&1
+    if errorlevel 1 (
+        echo   [YOK] %%~s
+    ) else (
+        for /f "tokens=4" %%a in ('sc query "%%~s" ^| find "STATE" 2^>nul') do (
+            if "%%a"=="RUNNING" ( echo   [CALISIYOR] %%~s ) else ( echo   [DURAKLATILMIS] %%~s )
+        )
+    )
+)
 
-echo [2/6] AMD Telemetri Servisleri taranıyor...
-powershell -ExecutionPolicy Bypass -Command "Get-Service -Name 'AMD External Events Utility' -ErrorAction SilentlyContinue | ForEach-Object { if($_.Status -eq 'Running') { Write-Host '   CALISIYOR - AMD External Events Utility' -ForegroundColor Red } else { Write-Host '   DURDURULMUS - AMD External Events Utility' -ForegroundColor Green } }"
-powershell -ExecutionPolicy Bypass -Command "Get-Service -Name 'AMD User Experience Program' -ErrorAction SilentlyContinue | ForEach-Object { if($_.Status -eq 'Running') { Write-Host '   CALISIYOR - AMD User Experience Program' -ForegroundColor Red } else { Write-Host '   DURDURULMUS - AMD User Experience Program' -ForegroundColor Green } }"
+:: Scheduled task'ler (schtasks /query ile, PowerShell yok)
+echo.
+echo [GOREVLER (Task Scheduler - schtasks)]
+set "task_list=NvTmRep_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8} NvTmRepOnLogon_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8} NvTmMon_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8} AMDDownLoadProviders AMDLinkUpdate AMDRyzenMasterSDKTask AMD_TELEMETRY AMD_User_Experience_Program"
+for %%t in (%task_list%) do (
+    schtasks /query /tn "%%t" >nul 2>&1
+    if errorlevel 1 (
+        echo   [YOK] %%t
+    ) else (
+        :: Durumu al
+        for /f "tokens=*" %%a in ('schtasks /query /tn "%%t" /fo list ^| find "Status:" 2^>nul') do (
+            set "durum=%%a"
+        )
+        echo !durum! | find "Disabled" >nul && echo   [DEVRE DISI] %%t || echo   [AKTIF] %%t
+    )
+)
 
-echo [3/6] Intel Telemetri Servisleri taranıyor...
-powershell -ExecutionPolicy Bypass -Command "Get-Service -Name 'Intel(R) Innovation Platform Framework Service' -ErrorAction SilentlyContinue | ForEach-Object { if($_.Status -eq 'Running') { Write-Host '   CALISIYOR - Intel Framework Service' -ForegroundColor Red } else { Write-Host '   DURDURULMUS - Intel Framework Service' -ForegroundColor Green } }"
+:: Telemetri DLL'leri (dir ile)
+echo.
+echo [SURUCU TELEMETRI DLL'LERI (DriverStore)]
+set nv_count=0
+for /f %%i in ('dir /s /b "%SystemRoot%\System32\DriverStore\FileRepository\*nvidia*telemetry*.dll" 2^>nul ^| find /c /v "" 2^>nul') do set nv_count=%%i
+if %nv_count% equ 0 ( echo   NVIDIA telemetri DLL bulunamadi ) else echo   NVIDIA telemetri DLL'leri mevcut (%nv_count% adet)
 
-echo [4/6] NVIDIA Görevleri taranıyor...
-powershell -ExecutionPolicy Bypass -Command "Get-ScheduledTask | Where-Object { $_.TaskPath -like '*NVIDIA*' } | ForEach-Object { Write-Host '   NVIDIA GOREV -' $_.TaskName -ForegroundColor Yellow }"
-
-echo [5/6] Diğer Servisler taranıyor...
-powershell -ExecutionPolicy Bypass -Command "Get-Service -Name 'igfxCUIService' -ErrorAction SilentlyContinue | ForEach-Object { if($_.Status -eq 'Running') { Write-Host '   CALISIYOR - Intel Graphics' -ForegroundColor Red } else { Write-Host '   DURDURULMUS - Intel Graphics' -ForegroundColor Green } }"
-powershell -ExecutionPolicy Bypass -Command "Get-Service -Name 'NVIDIA Display Container LS' -ErrorAction SilentlyContinue | ForEach-Object { if($_.Status -eq 'Running') { Write-Host '   CALISIYOR - NVIDIA Display' -ForegroundColor Red } else { Write-Host '   DURDURULMUS - NVIDIA Display' -ForegroundColor Green } }"
-
-echo [6/6] Tarama tamamlandı.
+set amd_count=0
+for /f %%i in ('dir /s /b "%SystemRoot%\System32\DriverStore\FileRepository\*amd*telemetry*.dll" 2^>nul ^| find /c /v "" 2^>nul') do set amd_count=%%i
+if %amd_count% equ 0 ( echo   AMD telemetri DLL bulunamadi ) else echo   AMD telemetri DLL'leri mevcut (%amd_count% adet)
 
 echo.
-echo === SONUÇ ===
+echo [HOSTS ENGELLEMELERI]
+set amd_hosts=0
+findstr /i "telemetry.amd.com" "%SystemRoot%\System32\drivers\etc\hosts" >nul 2>&1 && set amd_hosts=1
+findstr /i "amdupdate.amd.com" "%SystemRoot%\System32\drivers\etc\hosts" >nul 2>&1 && set amd_hosts=1
+findstr /i "logs.amd.com" "%SystemRoot%\System32\drivers\etc\hosts" >nul 2>&1 && set amd_hosts=1
+if %amd_hosts% equ 0 ( echo   Hosts'da AMD telemetri engeli yok ) else echo   AMD telemetri domain'leri hosts'da bloklanmis
+
+set nv_hosts=0
+findstr /i "telemetry.nvidia.com" "%SystemRoot%\System32\drivers\etc\hosts" >nul 2>&1 && set nv_hosts=1
+findstr /i "gfe.nvidia.com" "%SystemRoot%\System32\drivers\etc\hosts" >nul 2>&1 && set nv_hosts=1
+findstr /i "ortc.nvidia.com" "%SystemRoot%\System32\drivers\etc\hosts" >nul 2>&1 && set nv_hosts=1
+if %nv_hosts% equ 0 ( echo   Hosts'da NVIDIA telemetri engeli yok ) else echo   NVIDIA telemetri domain'leri hosts'da bloklanmis
+
 echo.
-echo CALISIYOR:    Telemetri aktif - Kırmızı
-echo DURDURULMUS:  Servis durdurulmus - Yeşil  
-echo NVIDIA GOREV: Planlanmış görevler - Sarı
-echo.
-echo NOT: CALISIYOR gorunen servisleri durdurmak icin
-echo      [6] TUM GPU TELEMETRILERINI DURDUR secenegini kullanin.
-echo.
+echo Tarama tamamlandi.
 pause
 goto gpu_telemetry_cleaner
 
-:nvidia_telemetry_disable
+:: ======================== NVIDIA GELİŞMİŞ KAPATMA ========================
+:nvidia_advanced_disable
 cls
 echo.
-echo     ╔════════════════════════════════════════════════════════╗
-echo     ║                NVIDIA TELEMETRİ KAPATMA                ║
-echo     ╚════════════════════════════════════════════════════════╝
+echo === NVIDIA TELEMETRI GELİŞMİŞ KAPATMA ===
+echo (Geri alinabilir - .OLD yedekleri olusturulur)
 echo.
-echo     NVIDIA telemetri servisleri durduruluyor...
-echo.
-echo     1. NVIDIA Container servisleri durduruluyor...
-sc stop "NVDisplay.ContainerLocalSystem" >nul 2>&1
-sc config "NVDisplay.ContainerLocalSystem" start= disabled >nul
 
-echo     2. NVIDIA Telemetry servisi kapatılıyor...
+:: 1. Scheduled task'leri devre dışı bırak
+echo [1/7] NVIDIA scheduled task'leri devre disi...
+PowerShell -ExecutionPolicy Bypass -Command "
+$tasks = @('NvTmRep_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}', 'NvTmRepOnLogon_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}', 'NvTmMon_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}')
+foreach ($t in $tasks) {
+    $task = Get-ScheduledTask -TaskName $t -ErrorAction Ignore
+    if ($task -and $task.State -ne 'Disabled') { Disable-ScheduledTask -TaskName $t -ErrorAction SilentlyContinue | Out-Null; Write-Host \"Devre disi: $t\" }
+    elseif ($task) { Write-Host \"Zaten devre disi: $t\" }
+    else { Write-Host \"Task bulunamadi: $t\" }
+}
+"
+
+:: 2. Servisleri durdur ve devre dışı bırak
+echo [2/7] NVIDIA servisleri durduruluyor...
 sc stop "NvTelemetryContainer" >nul 2>&1
 sc config "NvTelemetryContainer" start= disabled >nul
+sc stop "NVDisplay.ContainerLocalSystem" >nul 2>&1
+sc config "NVDisplay.ContainerLocalSystem" start= disabled >nul
+echo Servisler devre disi.
 
-echo     3. Kayıt defteri ayarları güncelleniyor...
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NVDisplay.ContainerLocalSystem" /v Start /t REG_DWORD /d 4 /f >nul
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NvTelemetryContainer" /v Start /t REG_DWORD /d 4 /f >nul
+:: 3. Telemetri paketlerini kaldır (varsa)
+echo [3/7] NVIDIA telemetri paketleri kaldiriliyor...
+if exist "%ProgramFiles%\NVIDIA Corporation\Installer2\InstallerCore\NVI2.DLL" (
+    rundll32 "%PROGRAMFILES%\NVIDIA Corporation\Installer2\InstallerCore\NVI2.DLL",UninstallPackage NvTelemetryContainer >nul 2>&1
+    rundll32 "%PROGRAMFILES%\NVIDIA Corporation\Installer2\InstallerCore\NVI2.DLL",UninstallPackage NvTelemetry >nul 2>&1
+    echo Paketler kaldirildi.
+) else echo NVIDIA Installer2 DLL bulunamadi.
 
-echo     4. Telemetri dosyaları temizleniyor...
-del /f /q "%ProgramData%\NVIDIA Corporation\NvTelemetry\*" 2>nul
-del /f /q "%LocalAppData%\NVIDIA\NvBackend\*" 2>nul
+:: 4. Telemetri dosyalarını .OLD yap
+echo [4/7] Telemetri dosyalari yedekleniyor (.OLD)...
+PowerShell -ExecutionPolicy Bypass -Command "
+$paths = @('%ProgramFiles%\NVIDIA Corporation\NvTelemetry\*', '%ProgramFiles(x86)%\NVIDIA Corporation\NvTelemetry\*', '%LocalAppData%\NVIDIA\NvBackend\*')
+foreach ($p in $paths) {
+    $exp = [Environment]::ExpandEnvironmentVariables($p)
+    Get-ChildItem -Path $exp -File -ErrorAction SilentlyContinue | Where-Object { -not $_.Name.EndsWith('.OLD') } | ForEach-Object {
+        Move-Item -LiteralPath $_.FullName -Destination (\"$($_.FullName).OLD\") -Force -ErrorAction SilentlyContinue
+        Write-Host \"Yedeklendi: $($_.Name)\"
+    }
+}
+"
+
+:: 5. Driver telemetri DLL'lerini .OLD yap
+echo [5/7] Surucu telemetri DLL'leri yedekleniyor...
+PowerShell -ExecutionPolicy Bypass -Command "
+$driverStore = [Environment]::ExpandEnvironmentVariables('%SystemRoot%\System32\DriverStore\FileRepository')
+$dlls = @(Get-ChildItem -Path $driverStore -Recurse -Filter 'NvTelemetry*.dll' -ErrorAction SilentlyContinue)
+foreach ($dll in $dlls) {
+    if (-not $dll.Name.EndsWith('.OLD')) {
+        Move-Item -LiteralPath $dll.FullName -Destination (\"$($dll.FullName).OLD\") -Force -ErrorAction SilentlyContinue
+        Write-Host \"DLL yedeklendi: $($dll.Name)\"
+    }
+}
+"
+
+:: 6. Registry anahtarları (telemetri opt-out)
+echo [6/7] Registry telemetri ayarlari...
+reg add "HKLM\SOFTWARE\NVIDIA Corporation\NvControlPanel2\Client" /v "OptInOrOutPreference" /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\NVIDIA Corporation\Global\FTS" /v "EnableRID44231" /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\NVIDIA Corporation\Global\FTS" /v "EnableRID64640" /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\NVIDIA Corporation\Global\FTS" /v "EnableRID66610" /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Global\Startup" /v "SendTelemetryData" /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\NVDisplay.ContainerLocalSystem" /v Start /t REG_DWORD /d 4 /f >nul
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\NvTelemetryContainer" /v Start /t REG_DWORD /d 4 /f >nul
+echo Registry ayarlari yapildi.
+
+:: 7. Hosts engelleme (ekstra)
+echo [7/7] Hosts dosyasina NVIDIA telemetri domain'leri ekleniyor...
+echo 0.0.0.0 telemetry.nvidia.com >> %SystemRoot%\System32\drivers\etc\hosts
+echo 0.0.0.0 gfe.nvidia.com >> %SystemRoot%\System32\drivers\etc\hosts
+echo 0.0.0.0 ortc.nvidia.com >> %SystemRoot%\System32\drivers\etc\hosts
 
 echo.
-echo      NVIDIA telemetri servisleri devre dışı bırakıldı
-echo      Performans izleme ve veri toplama durduruldu
-echo.
+echo NVIDIA telemetri tamamen engellendi. (Geri almak icin menu'den [7] kullanin)
 pause
-goto gpu_telemetry_cleaner
+goto menu
 
-:amd_telemetry_disable
+:: ======================== AMD GELİŞMİŞ KAPATMA ========================
+:amd_advanced_disable
 cls
 echo.
-echo     ╔════════════════════════════════════════════════════════╗
-echo     ║                 AMD TELEMETRİ KAPATMA                  ║
-echo     ╚════════════════════════════════════════════════════════╝
+echo === AMD TELEMETRI GELİŞMİŞ KAPATMA ===
 echo.
-echo     AMD telemetri servisleri durduruluyor...
-echo.
-echo     1. AMD User Experience Program durduruluyor...
+
+:: 1. Scheduled task'ler
+echo [1/8] AMD scheduled task'leri devre disi...
+PowerShell -ExecutionPolicy Bypass -Command "
+$tasks = @('AMDDownLoadProviders','AMDLinkUpdate','AMDRyzenMasterSDKTask','AMD Telemetry','AMD User Experience Program','AMDUpdater','AMDLogCollector')
+foreach ($t in $tasks) {
+    $task = Get-ScheduledTask -TaskName $t -ErrorAction Ignore
+    if ($task -and $task.State -ne 'Disabled') { Disable-ScheduledTask -TaskName $t -ErrorAction SilentlyContinue | Out-Null; Write-Host \"Devre disi: $t\" }
+}
+"
+
+:: 2. Servisler
+echo [2/8] AMD servisleri durduruluyor...
+sc stop "AMD External Events Utility" >nul 2>&1
+sc config "AMD External Events Utility" start= disabled >nul
+sc stop "AMDFCNRService" >nul 2>&1
+sc config "AMDFCNRService" start= disabled >nul
+sc stop "AMDRyzenMasterDriver" >nul 2>&1
+sc config "AMDRyzenMasterDriver" start= disabled >nul
+echo Servisler devre disi.
+
+:: 3. Prosesleri öldür
+echo [3/8] AMD telemetri prosesleri durduruluyor...
 taskkill /f /im "amdow.exe" 2>nul
 taskkill /f /im "AMDRSSrcExt.exe" 2>nul
+taskkill /f /im "AMDRSServ.exe" 2>nul
+taskkill /f /im "AMDRyzenMasterSDK.exe" 2>nul
 
-echo     2. AMD servisleri devre dışı bırakılıyor...
-sc stop "AMD External Events Utility" >nul 2>&1
-sc config "AMD External Events Utility" start= disabled >nul
+:: 4. Telemetri dosyalarını .OLD yap
+echo [4/8] AMD telemetri dosyalari yedekleniyor...
+PowerShell -ExecutionPolicy Bypass -Command "
+$folders = @('%ProgramData%\AMD\DVR','%LocalAppData%\AMD\DVR','%ProgramData%\AMD\Telemetry','%LocalAppData%\AMD\Telemetry','%ProgramData%\AMD\LogCollector')
+foreach ($f in $folders) {
+    $exp = [Environment]::ExpandEnvironmentVariables($f)
+    if (Test-Path $exp) {
+        Get-ChildItem -Path $exp -File -ErrorAction SilentlyContinue | Where-Object { -not $_.Name.EndsWith('.OLD') } | ForEach-Object {
+            Move-Item -LiteralPath $_.FullName -Destination (\"$($_.FullName).OLD\") -Force -ErrorAction SilentlyContinue
+            Write-Host \"Yedeklendi: $($_.Name)\"
+        }
+    }
+}
+"
 
-echo     3. Kayıt defteri ayarları güncelleniyor...
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\AMD\DVR" /v EnableDVR /t REG_DWORD /d 0 /f >nul
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\AMD\DVR" /v EnableTelemetry /t REG_DWORD /d 0 /f >nul
+:: 5. Driver telemetri DLL'leri .OLD
+echo [5/8] AMD surucu telemetri DLL'leri yedekleniyor...
+PowerShell -ExecutionPolicy Bypass -Command "
+$driverStore = [Environment]::ExpandEnvironmentVariables('%SystemRoot%\System32\DriverStore\FileRepository')
+$patterns = @('*amdtelemetry*.dll','*amdfcnr*.dll','*amdlog*.dll','*AMDRSServ*.dll')
+foreach ($pat in $patterns) {
+    Get-ChildItem -Path $driverStore -Recurse -Filter $pat -ErrorAction SilentlyContinue | ForEach-Object {
+        if (-not $_.Name.EndsWith('.OLD')) {
+            Move-Item -LiteralPath $_.FullName -Destination (\"$($_.FullName).OLD\") -Force -ErrorAction SilentlyContinue
+            Write-Host \"DLL yedeklendi: $($_.Name)\"
+        }
+    }
+}
+"
 
-echo     4. Telemetri dosyaları temizleniyor...
-del /f /q "%ProgramData%\AMD\DVR\*" 2>nul
-del /f /q "%LocalAppData%\AMD\DVR\*" 2>nul
+:: 6. Registry (kapsamlı)
+echo [6/8] AMD registry telemetri ayarlari...
+reg add "HKLM\SOFTWARE\AMD\DVR" /v EnableDVR /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\AMD\DVR" /v EnableTelemetry /t REG_DWORD /d 0 /f >nul
+reg add "HKCU\SOFTWARE\AMD\DVR" /v EnableTelemetry /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\AMD\AMDRyzenMasterSDK" /v TelemetryEnabled /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\AMD\AMDFCNR" /v TelemetryAllowed /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\AMD\CNG" /v TelemetryOptOut /t REG_DWORD /d 1 /f >nul
+reg add "HKLM\SOFTWARE\Policies\AMD\DVR" /v DisableTelemetry /t REG_DWORD /d 1 /f >nul
+
+:: 7. AMD User Experience Program exe'sini devre dışı bırak (.OLD)
+echo [7/8] AMD User Experience Program engelleniyor...
+if exist "%ProgramFiles%\AMD\AMD User Experience\amdow.exe" (
+    takeown /f "%ProgramFiles%\AMD\AMD User Experience" /r /d y >nul 2>&1
+    icacls "%ProgramFiles%\AMD\AMD User Experience" /grant "%USERNAME%":F /t >nul 2>&1
+    ren "%ProgramFiles%\AMD\AMD User Experience\amdow.exe" "amdow.exe.OLD" >nul 2>&1
+    echo amdow.exe .OLD yapildi.
+)
+
+:: 8. Hosts engelleme
+echo [8/8] Hosts dosyasina AMD telemetri domain'leri ekleniyor...
+echo 0.0.0.0 telemetry.amd.com >> %SystemRoot%\System32\drivers\etc\hosts
+echo 0.0.0.0 amdupdate.amd.com >> %SystemRoot%\System32\drivers\etc\hosts
+echo 0.0.0.0 logs.amd.com >> %SystemRoot%\System32\drivers\etc\hosts
 
 echo.
-echo      AMD telemetri servisleri devre dışı bırakıldı
-echo      Kullanıcı deneyimi veri toplama durduruldu
-echo.
+echo AMD telemetri tamamen engellendi.
 pause
-goto gpu_telemetry_cleaner
+goto menu
 
-:intel_telemetry_disable
+:: ======================== INTEL GELİŞMİŞ KAPATMA ========================
+:intel_advanced_disable
 cls
 echo.
-echo     ╔════════════════════════════════════════════════════════╗
-echo     ║                INTEL TELEMETRİ KAPATMA                 ║
-echo     ╚════════════════════════════════════════════════════════╝
+echo === INTEL TELEMETRI GELİŞMİŞ KAPATMA ===
 echo.
-echo     Intel telemetri servisleri durduruluyor...
-echo.
-echo     1. Intel GPU servisleri durduruluyor...
+
+:: 1. Scheduled task'ler
+echo [1/5] Intel scheduled task'leri devre disi...
+PowerShell -ExecutionPolicy Bypass -Command "
+$tasks = @('IntelTelemetry', 'IntelPIE', 'IntelAnalytics', 'Intel Driver Update')
+foreach ($t in $tasks) {
+    $task = Get-ScheduledTask -TaskName $t -ErrorAction Ignore
+    if ($task -and $task.State -ne 'Disabled') { Disable-ScheduledTask -TaskName $t -ErrorAction SilentlyContinue | Out-Null; Write-Host \"Devre disi: $t\" }
+}
+"
+
+:: 2. Servisler
+echo [2/5] Intel servisleri durduruluyor...
 sc stop "igfxCUIService2.0.0.0" >nul 2>&1
 sc config "igfxCUIService2.0.0.0" start= disabled >nul
+sc stop "Intel(R) Innovation Platform Framework Service" >nul 2>&1
+sc config "Intel(R) Innovation Platform Framework Service" start= disabled >nul
+sc stop "IntelAnalyticsService" >nul 2>&1
+sc config "IntelAnalyticsService" start= disabled >nul
 
-echo     2. Intel Analytics durduruluyor...
+:: 3. Telemetri prosesleri
+echo [3/5] Intel prosesleri durduruluyor...
 taskkill /f /im "IntelAnalyticsService.exe" 2>nul
+taskkill /f /im "IntelTelemetry.exe" 2>nul
 
-echo     3. Kayıt defteri ayarları güncelleniyor...
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Intel\GFX" /v TelemetryEnabled /t REG_DWORD /d 0 /f >nul
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Intel\PerfTune" /v EnableTelemetry /t REG_DWORD /d 0 /f >nul
+:: 4. Telemetri dosyalarını .OLD yap
+echo [4/5] Intel telemetri dosyalari yedekleniyor...
+PowerShell -ExecutionPolicy Bypass -Command "
+$paths = @('%ProgramData%\Intel\*analytics*','%ProgramData%\Intel\*telemetry*','%LocalAppData%\Intel\*telemetry*')
+foreach ($p in $paths) {
+    $exp = [Environment]::ExpandEnvironmentVariables($p)
+    Get-ChildItem -Path $exp -File -ErrorAction SilentlyContinue | Where-Object { -not $_.Name.EndsWith('.OLD') } | ForEach-Object {
+        Move-Item -LiteralPath $_.FullName -Destination (\"$($_.FullName).OLD\") -Force -ErrorAction SilentlyContinue
+        Write-Host \"Yedeklendi: $($_.Name)\"
+    }
+}
+"
 
-echo     4. Telemetri dosyaları temizleniyor...
-del /f /q "%ProgramData%\Intel\*analytics*" 2>nul
-del /f /q "%LocalAppData%\Intel\*telemetry*" 2>nul
+:: 5. Registry
+echo [5/5] Intel registry telemetri ayarlari...
+reg add "HKLM\SOFTWARE\Intel\GFX" /v TelemetryEnabled /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\Intel\PerfTune" /v EnableTelemetry /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\Intel\Telemetry" /v AllowTelemetry /t REG_DWORD /d 0 /f >nul
 
 echo.
-echo      Intel telemetri servisleri devre dışı bırakıldı
-echo      Grafik istatistik toplama durduruldu
-echo.
+echo Intel telemetri tamamen engellendi.
 pause
-goto gpu_telemetry_cleaner
+goto menu
 
-:gamebar_telemetry_disable
+:: ======================== GAME BAR TELEMETRİ KAPAT ========================
+:gamebar_advanced_disable
 cls
 echo.
-echo     ╔════════════════════════════════════════════════════════╗
-echo     ║              WINDOWS GAME BAR TELEMETRİSİ              ║
-echo     ╚════════════════════════════════════════════════════════╝
+echo === WINDOWS GAME BAR TELEMETRI KAPATMA ===
 echo.
-echo     Windows Game Bar telemetrisi kapatılıyor...
-echo.
-echo     1. Game Bar devre dışı bırakılıyor...
-reg add "HKEY_CURRENT_USER\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d 0 /f >nul
-reg add "HKEY_CURRENT_USER\Software\Microsoft\GameBar" /v "UseNexusForGameBarEnabled" /t REG_DWORD /d 0 /f >nul
 
-echo     2. Oyun DVR özellikleri kapatılıyor...
-reg add "HKEY_CURRENT_USER\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d 0 /f >nul
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f >nul
+:: Registry ayarları (kapsamlı)
+reg add "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d 0 /f >nul
+reg add "HKCU\Software\Microsoft\GameBar" /v "UseNexusForGameBarEnabled" /t REG_DWORD /d 0 /f >nul
+reg add "HKCU\Software\Microsoft\GameBar" /v "ShowStartupPanel" /t REG_DWORD /d 0 /f >nul
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v "value" /t REG_DWORD /d 0 /f >nul
 
-echo     3. Oyun modu telemetrisi kapatılıyor...
-reg add "HKEY_CURRENT_USER\Software\Microsoft\GameBar" /v "ShowStartupPanel" /t REG_DWORD /d 0 /f >nul
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v "value" /t REG_DWORD /d 0 /f >nul
+:: Game Bar proseslerini durdur (varsa)
+taskkill /f /im "GameBar.exe" 2>nul
+taskkill /f /im "GameBarFT.exe" 2>nul
+taskkill /f /im "GameBarPresenceWriter.exe" 2>nul
 
-echo.
-echo      Windows Game Bar telemetrisi devre dışı bırakıldı
-echo      Oyun DVR ve kayıt özellikleri kapatıldı
-echo.
+echo Game Bar telemetrisi devre disi birakildi.
 pause
-goto gpu_telemetry_cleaner
+goto menu
 
-:all_gpu_telemetry_disable
+:: ======================== TÜMÜNÜ KAPAT ========================
+:all_disable
 cls
 echo.
-echo     ╔════════════════════════════════════════════════════════╗
-echo     ║              TÜM GPU TELEMETRİSİNİ KAPAT               ║
-echo     ╚════════════════════════════════════════════════════════╝
+echo === TUM GPU TELEMETRILERI KAPATILIYOR ===
+call :nvidia_advanced_disable_silent
+call :amd_advanced_disable_silent
+call :intel_advanced_disable_silent
+call :gamebar_advanced_disable_silent
 echo.
-echo     Tüm GPU telemetri servisleri kapatılıyor...
-echo.
-call :nvidia_telemetry_disable_silent
-call :amd_telemetry_disable_silent
-call :intel_telemetry_disable_silent
-call :gamebar_telemetry_disable_silent
-
-echo.
-echo     ════════════════════════════════════════════════
-echo      TÜM GPU TELEMETRİ SERVİSLERİ KAPATILDI
-echo     ════════════════════════════════════════════════
-echo.
-echo      NVIDIA telemetri: DEVRE DIŞI
-echo      AMD telemetri: DEVRE DIŞI  
-echo      Intel telemetri: DEVRE DIŞI
-echo      Game Bar telemetri: DEVRE DIŞI
-echo.
-echo     NOT: Sistem performansı artacak ve gizlilik korunacak
-echo.
+echo Tüm GPU telemetrileri engellendi.
 pause
-goto gpu_telemetry_cleaner
+goto menu
 
-:telemetry_reset
+:: ======================== TAM GERİ ALMA (REVERT) ========================
+:full_revert
 cls
 echo.
-echo     ╔════════════════════════════════════════════════════════╗
-echo     ║              TELEMETRİ AYARLARINI SIFIRLA              ║
-echo     ╚════════════════════════════════════════════════════════╝
+echo ⚠⚠⚠ TÜM DEĞİŞİKLİKLERİ GERİ ALIYORSUNUZ ⚠⚠⚠
+echo Bu işlem, bu script ile yapılmış tüm telemetri engellemelerini
+echo (servisler, task'ler, .OLD dosyalar, hosts, registry) varsayılana döndürür.
 echo.
-echo     Telemetri ayarları varsayılana döndürülüyor...
-echo.
-echo     1. NVIDIA servisleri etkinleştiriliyor...
-sc config "NVDisplay.ContainerLocalSystem" start= auto >nul
+set /p onay="Devam etmek istiyor musunuz? (E/H): "
+if /i not "%onay%"=="E" goto menu
+
+:: 1. NVIDIA geri al
+echo [1/5] NVIDIA ayarlari geri aliniyor...
 sc config "NvTelemetryContainer" start= auto >nul
+sc config "NVDisplay.ContainerLocalSystem" start= auto >nul
+PowerShell -ExecutionPolicy Bypass -Command "
+$tasks = @('NvTmRep_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}', 'NvTmRepOnLogon_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}', 'NvTmMon_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}')
+foreach ($t in $tasks) { Enable-ScheduledTask -TaskName $t -ErrorAction SilentlyContinue | Out-Null }
+# .OLD dosyalari geri al
+$paths = @('%ProgramFiles%\NVIDIA Corporation\NvTelemetry\*','%ProgramFiles(x86)%\NVIDIA Corporation\NvTelemetry\*','%LocalAppData%\NVIDIA\NvBackend\*')
+foreach ($p in $paths) {
+    $exp = [Environment]::ExpandEnvironmentVariables($p)
+    Get-ChildItem -Path $exp -File -ErrorAction SilentlyContinue | Where-Object { $_.Name.EndsWith('.OLD') } | ForEach-Object {
+        $newName = $_.FullName -replace '\.OLD$',''
+        Move-Item -LiteralPath $_.FullName -Destination $newName -Force -ErrorAction SilentlyContinue
+    }
+}
+# Driver DLL'leri geri al
+$driverStore = [Environment]::ExpandEnvironmentVariables('%SystemRoot%\System32\DriverStore\FileRepository')
+Get-ChildItem -Path $driverStore -Recurse -Filter 'NvTelemetry*.dll.OLD' -ErrorAction SilentlyContinue | ForEach-Object {
+    $newName = $_.FullName -replace '\.OLD$',''
+    Move-Item -LiteralPath $_.FullName -Destination $newName -Force -ErrorAction SilentlyContinue
+}
+"
 
-echo     2. AMD servisleri etkinleştiriliyor...
+:: 2. AMD geri al
+echo [2/5] AMD ayarlari geri aliniyor...
 sc config "AMD External Events Utility" start= auto >nul
+sc config "AMDFCNRService" start= auto >nul
+sc config "AMDRyzenMasterDriver" start= auto >nul
+PowerShell -ExecutionPolicy Bypass -Command "
+$tasks = @('AMDDownLoadProviders','AMDLinkUpdate','AMDRyzenMasterSDKTask','AMD Telemetry','AMD User Experience Program','AMDUpdater','AMDLogCollector')
+foreach ($t in $tasks) { Enable-ScheduledTask -TaskName $t -ErrorAction SilentlyContinue | Out-Null }
+# .OLD dosyalar
+$folders = @('%ProgramData%\AMD\DVR','%LocalAppData%\AMD\DVR','%ProgramData%\AMD\Telemetry','%LocalAppData%\AMD\Telemetry','%ProgramData%\AMD\LogCollector')
+foreach ($f in $folders) {
+    $exp = [Environment]::ExpandEnvironmentVariables($f)
+    if (Test-Path $exp) {
+        Get-ChildItem -Path $exp -File -ErrorAction SilentlyContinue | Where-Object { $_.Name.EndsWith('.OLD') } | ForEach-Object {
+            $newName = $_.FullName -replace '\.OLD$',''
+            Move-Item -LiteralPath $_.FullName -Destination $newName -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+# AMD driver DLL'leri
+$driverStore = [Environment]::ExpandEnvironmentVariables('%SystemRoot%\System32\DriverStore\FileRepository')
+$patterns = @('*amdtelemetry*.dll.OLD','*amdfcnr*.dll.OLD','*amdlog*.dll.OLD','*AMDRSServ*.dll.OLD')
+foreach ($pat in $patterns) {
+    Get-ChildItem -Path $driverStore -Recurse -Filter $pat -ErrorAction SilentlyContinue | ForEach-Object {
+        $newName = $_.FullName -replace '\.OLD$',''
+        Move-Item -LiteralPath $_.FullName -Destination $newName -Force -ErrorAction SilentlyContinue
+    }
+}
+"
+:: AMD User Experience exe'yi geri al
+if exist "%ProgramFiles%\AMD\AMD User Experience\amdow.exe.OLD" (
+    ren "%ProgramFiles%\AMD\AMD User Experience\amdow.exe.OLD" "amdow.exe" >nul 2>&1
+)
 
-echo     3. Intel servisleri etkinleştiriliyor...
+:: 3. Intel geri al
+echo [3/5] Intel ayarlari geri aliniyor...
 sc config "igfxCUIService2.0.0.0" start= auto >nul
+sc config "Intel(R) Innovation Platform Framework Service" start= auto >nul
+sc config "IntelAnalyticsService" start= auto >nul
+PowerShell -ExecutionPolicy Bypass -Command "
+$tasks = @('IntelTelemetry','IntelPIE','IntelAnalytics','Intel Driver Update')
+foreach ($t in $tasks) { Enable-ScheduledTask -TaskName $t -ErrorAction SilentlyContinue | Out-Null }
+# .OLD dosyalar
+$paths = @('%ProgramData%\Intel\*analytics*','%ProgramData%\Intel\*telemetry*','%LocalAppData%\Intel\*telemetry*')
+foreach ($p in $paths) {
+    $exp = [Environment]::ExpandEnvironmentVariables($p)
+    Get-ChildItem -Path $exp -File -ErrorAction SilentlyContinue | Where-Object { $_.Name.EndsWith('.OLD') } | ForEach-Object {
+        $newName = $_.FullName -replace '\.OLD$',''
+        Move-Item -LiteralPath $_.FullName -Destination $newName -Force -ErrorAction SilentlyContinue
+    }
+}
+"
 
-echo     4. Game Bar ayarları sıfırlanıyor...
-reg delete "HKEY_CURRENT_USER\Software\Microsoft\GameBar" /f >nul 2>&1
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /f >nul 2>&1
+:: 4. Game Bar geri al (registry anahtarlarını sil)
+echo [4/5] Game Bar ayarlari sifirlaniyor...
+reg delete "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /f >nul 2>&1
+reg delete "HKCU\Software\Microsoft\GameBar" /v "UseNexusForGameBarEnabled" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /f >nul 2>&1
+reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /f >nul 2>&1
+
+:: 5. Hosts dosyasındaki eklemeleri kaldır (geçici olarak yedek al, filtrele)
+echo [5/5] Hosts dosyasindaki telemetri domain'leri temizleniyor...
+set "hosts=%SystemRoot%\System32\drivers\etc\hosts"
+if exist "%hosts%" (
+    findstr /v "telemetry.nvidia.com gfe.nvidia.com ortc.nvidia.com telemetry.amd.com amdupdate.amd.com logs.amd.com" "%hosts%" > "%hosts%.tmp"
+    move /y "%hosts%.tmp" "%hosts%" >nul
+)
 
 echo.
-echo      Telemetri ayarları varsayılana döndürüldü
-echo      Tüm GPU servisleri yeniden etkinleştirildi
-echo.
+echo Tüm değişiklikler geri alindi. Bilgisayari yeniden baslatmaniz onerilir.
 pause
-goto gpu_telemetry_cleaner
+goto menu
 
-:nvidia_telemetry_disable_silent
-sc stop "NVDisplay.ContainerLocalSystem" >nul 2>&1
-sc config "NVDisplay.ContainerLocalSystem" start= disabled >nul
-sc stop "NvTelemetryContainer" >nul 2>&1
-sc config "NvTelemetryContainer" start= disabled >nul
+:: ======================== SESSİZ ALT RUTİNLER ========================
+:nvidia_advanced_disable_silent
+call :nvidia_advanced_disable >nul 2>&1
 goto :eof
-
-:amd_telemetry_disable_silent
-sc stop "AMD External Events Utility" >nul 2>&1
-sc config "AMD External Events Utility" start= disabled >nul
+:amd_advanced_disable_silent
+call :amd_advanced_disable >nul 2>&1
 goto :eof
-
-:intel_telemetry_disable_silent
-sc stop "igfxCUIService2.0.0.0" >nul 2>&1
-sc config "igfxCUIService2.0.0.0" start= disabled >nul
+:intel_advanced_disable_silent
+call :intel_advanced_disable >nul 2>&1
 goto :eof
-
-:gamebar_telemetry_disable_silent
-reg add "HKEY_CURRENT_USER\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d 0 /f >nul
+:gamebar_advanced_disable_silent
+call :gamebar_advanced_disable >nul 2>&1
 goto :eof
 
 :drivers_menu
@@ -9262,7 +9464,7 @@ cGFyYW0oDQogICAgW3N0cmluZ10kVGl0bGVDb250YWlucyA9ICJQTUFTIg0KKQ0KDQpBZGQtVHlwZSBA
 ::===============================================================================================================
 
 :mas_ofline
-echo Hata vermesi halinde ikinci defa tekrar çalıştırın.
+echo Ana menüye dönmesi halinde ikinci defa tekrar çalıştırın.
     echo.
     timeout /t 3 /nobreak >nul
 @::Please stop false-flagging this script over and over. This is the 3rd time I've had to update the script to deal with the false positives.
@@ -9270,7 +9472,7 @@ echo Hata vermesi halinde ikinci defa tekrar çalıştırın.
 @::Is a real person even the one deciding to flag this or is it Copilot told to flag anything it decides not to like?
 @::If a campaign is using this script as a cover, please flag parts of the campaign instead of the script. This isn't the first time we experienced collateral damage due to campaigns completely unrelated to us.
 @::If you disagree that MAS is not malicious, we would appreciate if you contacted us to explain what constitutes MAS as "Sonbokli" and we'll look into it. Thank you. 
-@set masver=3.10
+@set masver=3.11
 @setlocal DisableDelayedExpansion
 @echo off
 
@@ -9496,7 +9698,7 @@ goto dk_done
 
 ::pstst $ExecutionContext.SessionState.LanguageMode :pstst
 
-for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[System.IO.File]::ReadAllText('!_batp!') -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
+for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!') -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
 
 if /i not "%tstresult%"=="FullLanguage" (
 %eline%
@@ -9876,7 +10078,7 @@ set "_dir=!desktop!\$OEM$\$$\Setup\Scripts"
 md "!_dir!\"
 
 :: Add random data on top to create unique file which helps in avoiding AV's detections
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!'); [io.file]::WriteAllText('!_pdesk!\$OEM$\$$\Setup\Scripts\MAS_AIO.cmd', '@::RANDOM-' + [Guid]::NewGuid().Guid + [Environment]::NewLine + $f, [System.Text.Encoding]::ASCII)"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!'); [io.file]::WriteAllText('!_pdesk!\$OEM$\$$\Setup\Scripts\MAS_AIO.cmd', '@::RANDOM-' + [Guid]::NewGuid().Guid + [Environment]::NewLine + $f, [System.Text.Encoding]::ASCII)"
 
 (
 echo @echo off
@@ -10091,7 +10293,7 @@ set notworking=
 call :dk_actids 55c92734-d682-4d71-983e-d6ec3f16059f
 if defined allapps call :hwiddata key
 if not defined key (
-for /f "delims=" %%a in ('%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':getactivationid\:.*';. ([scriptblock]::Create($f[1]))"') do (set altapplist=%%a)
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':getactivationid\:.*';. ([scriptblock]::Create($f[1]))"') do (set altapplist=%%a)
 if defined altapplist call :hwiddata key
 )
 
@@ -10513,7 +10715,7 @@ for /f "tokens=3 delims=." %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Con
 if %_wmic% EQU 1 for /f "tokens=2 delims==" %%a in ('"wmic Path Win32_OperatingSystem Get OperatingSystemSKU /format:LIST" %nul6%') do if not errorlevel 1 set "wmiSKU=%%a"
 if %_wmic% EQU 0 for /f "tokens=1" %%a in ('%psc% "([WMI]'Win32_OperatingSystem=@').OperatingSystemSKU" %nul6%') do if not errorlevel 1 set "wmiSKU=%%a"
 
-if %winbuild% GEQ 15063 %psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':winsubstatus\:.*';. ([scriptblock]::Create($f[1]))" %nul2% | find /i "Subscription_is_activated" %nul% && (
+if %winbuild% GEQ 15063 %psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':winsubstatus\:.*';. ([scriptblock]::Create($f[1]))" %nul2% | find /i "Subscription_is_activated" %nul% && (
 if defined regSKU if defined slcSKU if not "%regSKU%"=="%slcSKU%" (
 set winsub=1
 set osSKU=%regSKU%
@@ -11160,7 +11362,7 @@ set showfix=1
 
 set chkalp=
 set wpainfo=NotFound
-for /f "delims=" %%a in ('%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':wpatest\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (set wpainfo=%%a)
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':wpatest\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (set wpainfo=%%a)
 for /f "delims=0123456789" %%i in ("%wpainfo%") do set chkalp=%%i
 
 if defined chkalp (
@@ -11234,7 +11436,7 @@ set showfix=1
 call :dk_actid 55c92734-d682-4d71-983e-d6ec3f16059f
 
 if not defined apps (
-%psc% "if (-not $env:_vis) {Start-Job { Stop-Service %_slser% -force } | Wait-Job -Timeout 20 | Out-Null}; $sls = Get-WmiObject SoftwareLicensingService; $f=[System.IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
+%psc% "if (-not $env:_vis) {Start-Job { Stop-Service %_slser% -force } | Wait-Job -Timeout 20 | Out-Null}; $sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
 if not defined _vis if !errorlevel! NEQ 0 set rlicfailed=1
 call :dk_actid 55c92734-d682-4d71-983e-d6ec3f16059f
 )
@@ -11599,7 +11801,7 @@ REM Generate ticket
 
 if %1==ticket if "%key%"=="%%B" (
 set "SessionIdStr=OSMajorVersion=5;OSMinorVersion=1;OSPlatformId=2;PP=0;Pfn=Microsoft.Windows.%%C.%%D_8wekyb3d8bbwe;PKeyIID=465145217131314304264339481117862266242033457260311819664735280;"
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':sign\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':sign\:.*';. ([scriptblock]::Create($f[1]))"
 )
 
 )
@@ -11674,7 +11876,7 @@ $SignatureStr = SignProperties $PropertiesStr $rsa
 $xml = @"
 <?xml version="1.0" encoding="utf-8"?><genuineAuthorization xmlns="http://www.microsoft.com/DRM/SL/GenuineAuthorization/1.0"><version>1.0</version><genuineProperties origin="sppclient"><properties>$PropertiesStr</properties><signatures><signature name="clientLockboxKey" method="rsa-sha256">$SignatureStr</signature></signatures></genuineProperties></genuineAuthorization>
 "@
-[System.IO.File]::WriteAllText("$env:ProgramData\Microsoft\Windows\ClipSVC\GenuineTicket\GenuineTicket", ($xml -join ""), [System.Text.Encoding]::ASCII)
+[IO.File]::WriteAllText("$env:ProgramData\Microsoft\Windows\ClipSVC\GenuineTicket\GenuineTicket", ($xml -join ""), [System.Text.Encoding]::ASCII)
 :sign:
 
 ::========================================================================================================================================
@@ -12456,7 +12658,7 @@ for %%# in ("!_oLPath!\%_License%*.xrm-ms") do (
 if defined _arr (set "_arr=!_arr!;"!_oLPath!\%%~nx#"") else (set "_arr="!_oLPath!\%%~nx#"")
 )
 
-%psc% "$sls = Get-WmiObject %sps%; $f=[System.IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); InstallLicenseArr '!_arr!'; InstallLicenseFile '"!_oLPath!\pkeyconfig-office.xrm-ms"'" %nul%
+%psc% "$sls = Get-WmiObject %sps%; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); InstallLicenseArr '!_arr!'; InstallLicenseFile '"!_oLPath!\pkeyconfig-office.xrm-ms"'" %nul%
 
 call :dk_actids 0ff1ce15-a989-479d-af46-f275c6370663
 echo "!allapps!" | find /i "!_actid!" %nul1% || (
@@ -12987,8 +13189,8 @@ exit /b
 :oh_licrefresh
 
 if exist "%SysPath%\spp\store_test\2.0\tokens.dat" (
-%psc% "Stop-Service sppsvc -force; $sls = Get-WmiObject SoftwareLicensingService; $f=[System.IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
-if !errorlevel! NEQ 0 %psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[System.IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
+%psc% "Stop-Service sppsvc -force; $sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
+if !errorlevel! NEQ 0 %psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
 )
 exit /b
 
@@ -13324,7 +13526,7 @@ exit /b
 :oh_extractdll
 
 set b=
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':%_hook%\:.*';$encoded = ($f[1]) -replace '-', 'A' -replace '_', 'a';$bytes = [Con%b%vert]::FromBas%b%e64String($encoded); $PePath='%1'; $offset='%2'; $m=[System.IO.File]::ReadAllText('!_batp!') -split ':hexedit\:.*';. ([scriptblock]::Create($m[1]))" %nul2% | find /i "Error found" %nul1% && set hasherror=1
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':%_hook%\:.*';$encoded = ($f[1]) -replace '-', 'A' -replace '_', 'a';$bytes = [Con%b%vert]::FromBas%b%e64String($encoded); $PePath='%1'; $offset='%2'; $m=[IO.File]::ReadAllText('!_batp!') -split ':hexedit\:.*';. ([scriptblock]::Create($m[1]))" %nul2% | find /i "Error found" %nul1% && set hasherror=1
 exit /b
 
 :hexedit:
@@ -13364,7 +13566,7 @@ $Writer.Flush()
 
 # Write the current state of the MemoryStream to a temporary file
 $tempFilePath = "$env:windir\Temp\$([System.IO.Path]::GetRandomFileName())"
-[System.IO.File]::WriteAllBytes($tempFilePath, $MemoryStream.ToArray())
+[IO.File]::WriteAllBytes($tempFilePath, $MemoryStream.ToArray())
 
 # Update hash using the temporary file
 [int]$HeaderSum = 0
@@ -13387,7 +13589,7 @@ Remove-Item -Path $tempFilePath -Force
 $modifiedBytes = $MemoryStream.ToArray()
 
 # Write the modified bytes to the final file
-[System.IO.File]::WriteAllBytes($PePath, $modifiedBytes)
+[IO.File]::WriteAllBytes($PePath, $modifiedBytes)
 
 [void]$Imagehlp::MapFileAndCheckSum($PePath, [ref]$HeaderSum, [ref]$CheckSum)
 if ($HeaderSum -ne $CheckSum) {
@@ -13959,7 +14161,7 @@ if defined _vis goto :ts_winvista
 
 set tempid=
 if /i %tsmethod%==KMS4k (set keytype=ks) else (set keytype=zero)
-for /f "delims=" %%a in ('%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':wintsid\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':wintsid\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (
 echo "%%a" | findstr /r ".*-.*-.*-.*-.*" %nul1% && (set tsids=!tsids! %%a& set tempid=%%a)
 )
 
@@ -14249,7 +14451,7 @@ goto :ts_esu
 )
 
 set resetstuff=1
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':tsforge\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':tsforge\:.*';. ([scriptblock]::Create($f[1]))"
 set resetstuff=
 if !errorlevel!==3 (
 set error=1
@@ -14288,7 +14490,7 @@ set esuexistsup=
 set esueditionlist=
 set esuexistbutnosup=
 
-for %%# in (EnterpriseS IoTEnterpriseS IoTEnterpriseSK) do (if /i %tsedition%==%%# set isltsc=1)
+if %winbuild% GTR 14393 for %%# in (EnterpriseS IoTEnterpriseS IoTEnterpriseSK) do (if /i %tsedition%==%%# set isltsc=1)
 if exist "%SystemRoot%\Servicing\Packages\Microsoft-Windows-Server*Edition~*.mum" set isServer=1
 
 if /i %tsedition%==Embedded (
@@ -14326,6 +14528,7 @@ REM Windows8.1
 11be7019-a309-4763-9a09-091d1722ffe3_Client-FES-ESU-Year3[1-3y]_-EmbeddedIndustry-EmbeddedIndustryE-
 REM WindowsServer2012/2012R2
 55b1dd2d-2209-4ea0-a805-06298bad25b3_Server-ESU-Year3[1-3y]_-ServerDatacenter-ServerDatacenterCore-ServerDatacenterV-ServerDatacenterVCore-ServerStandard-ServerStandardCore-ServerStandardV-ServerStandardVCore-
+1b60284a-63b5-42da-8ec9-eaab825e2bc8_Server-ESU-Year5[4-5y]_-ServerDatacenter-ServerDatacenterCore-ServerDatacenterV-ServerDatacenterVCore-ServerStandard-ServerStandardCore-ServerStandardV-ServerStandardVCore-
 REM Windows10
 f520e45e-7413-4a34-a497-d2765967d094_Client-ESU-Year1_-%w10EsuEditions%-%w10EsuEditionsLaterAdded%
 1043add5-23b1-4afb-9a0f-64343c8f3f8d_Client-ESU-Year2_-%w10EsuEditions%-%w10EsuEditionsLaterAdded%
@@ -14334,6 +14537,9 @@ f520e45e-7413-4a34-a497-d2765967d094_Client-ESU-Year1_-%w10EsuEditions%-%w10EsuE
 REM WindowsServer2016
 91bcac0a-d7d3-4d2b-bd0c-72fed675f01b_Server-ESU-Year3[1-3y]_-ServerDatacenter-ServerDatacenterCore-ServerDatacenterV-ServerDatacenterVCore-ServerStandard-ServerStandardCore-ServerStandardV-ServerStandardVCore-
 4cd0ab30-73a4-4dde-972c-512f05be31df_Server-ESU-Year6[4-6y]_-ServerDatacenter-ServerDatacenterCore-ServerDatacenterV-ServerDatacenterVCore-ServerStandard-ServerStandardCore-ServerStandardV-ServerStandardVCore-
+REM Windows10LTSB2016
+f2571710-2c24-4677-8fb5-a07d41d3c1aa_Client-ESU-Year3[1-3y]_-EnterpriseS-EnterpriseSN-
+22badfe6-7d55-4485-874b-7ec317442134_Client-ESU-Year6[4-6y]_-EnterpriseS-EnterpriseSN-
 ) do (
 for /f "tokens=1-3 delims=_" %%A in ("%%#") do (
 echo "%allapps%" | find /i "%%A" %nul1% && (
@@ -14389,7 +14595,7 @@ goto :ts_off
 set esuavail=
 if defined _vis if defined isServer set esuavail=1
 if %winbuild% LEQ 7602 if not defined _vis if not defined isThinpc set esuavail=1
-if %winbuild% GTR 7602 if %winbuild% LSS 14393 if defined isServer set esuavail=1
+if %winbuild% GTR 7602 if %winbuild% LEQ 14393 if defined isServer set esuavail=1
 if %winbuild% GEQ 10240 if %winbuild% LEQ 19045 if not defined isServer set esuavail=1
 if %winbuild% EQU 9600 set esuavail=1
 
@@ -14737,10 +14943,10 @@ if %winbuild% GEQ 10586 (
 for %%# in ("%SysPath%\spp\tokens\skus\%tsedition%\*CSVLK*.xrm-ms") do (
 if defined _arr (set "_arr=!_arr!;"%SysPath%\spp\tokens\skus\%tsedition%\%%~nx#"") else (set "_arr="%SysPath%\spp\tokens\skus\%tsedition%\%%~nx#"")
 )
-if defined _arr %psc% "$sls = Get-WmiObject %sps%; $f=[System.IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); InstallLicenseArr '!_arr!'" %nul%
+if defined _arr %psc% "$sls = Get-WmiObject %sps%; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); InstallLicenseArr '!_arr!'" %nul%
 )
 
-for /f "delims=" %%a in ('%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':wintsid\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':wintsid\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (
 echo "%%a" | findstr /r ".*-.*-.*-.*-.*" %nul1% && (set tsids=!tsids! %%a& set tempid=%%a)
 )
 
@@ -14934,7 +15140,7 @@ echo Processing Reset of Rearm / Timers / Tamper / Lock...
 echo:
 
 set resetstuff=1
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':tsforge\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':tsforge\:.*';. ([scriptblock]::Create($f[1]))"
 
 if %errorlevel%==3 (
 call :dk_color %Red% "Reset Failed."
@@ -14982,7 +15188,7 @@ if %errorlevel%==1 exit /b
 echo:
 echo Fetching Supported Activation IDs list. Please wait...
 
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':listactids\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':listactids\:.*';. ([scriptblock]::Create($f[1]))"
 if %errorlevel%==3 (
 call :dk_color %Gray% "No supported activation ID found, aborting..."
 goto :dk_done
@@ -15132,7 +15338,7 @@ echo Writing TrustedStore data...
 if /i %tsmethod%==StaticCID (echo Depositing Static Confirmation ID...) else (echo Depositing Zero Confirmation ID...)
 )
 echo:
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':tsforge\:.*';. ([scriptblock]::Create($f[1])) %tsids%"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':tsforge\:.*';. ([scriptblock]::Create($f[1])) %tsids%"
 if !errorlevel!==3 (
 if %_actman%==0 (if not defined showfix call :dk_color %Blue% "%_fixmsg%")
 set fixes=%fixes% %mas%troubleshoot
@@ -15335,7 +15541,7 @@ echo !_License! | find /i "Retail" %nul% && (set keytype=zero) || (set keytype=k
 set keytype=zero
 )
 
-for /f "delims=" %%a in ('%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':offtsid\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':offtsid\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (
 echo "%%a" | findstr /r ".*-.*-.*-.*-.*" %nul1% && (set tsids=!tsids! %%a& set _actid=%%a)
 )
 set "_allactid=!tsids!"
@@ -22857,7 +23063,7 @@ if not defined _int (s%nil%cht%nil%asks /cre%nil%ate /tn "Activation-Run_Once" /
 if exist "%_temp%\.*" rmdir /s /q "%_temp%\" %nul%
 
 call :ks_createInfo.txt
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split \":_extracttask\:.*`r`n\"; [io.file]::WriteAllText('%_dest%\Activation_task.cmd', '@::%randguid%' + [Environment]::NewLine + $f[1].Trim(), [System.Text.Encoding]::ASCII)"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split \":_extracttask\:.*`r`n\"; [io.file]::WriteAllText('%_dest%\Activation_task.cmd', '@::%randguid%' + [Environment]::NewLine + $f[1].Trim(), [System.Text.Encoding]::ASCII)"
 
 ::========================================================================================================================================
 
@@ -22887,7 +23093,7 @@ exit /b
 
 :ks_RenExport
 
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split \":%~1\:.*`r`n\"; [io.file]::WriteAllText('%~2',$f[1].Trim(),[System.Text.Encoding]::%~3);"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split \":%~1\:.*`r`n\"; [io.file]::WriteAllText('%~2',$f[1].Trim(),[System.Text.Encoding]::%~3);"
 exit /b
 
 ::========================================================================================================================================
@@ -23735,7 +23941,7 @@ mode 100, 36
 %psc% "&{$W=$Host.UI.RawUI.WindowSize;$B=$Host.UI.RawUI.BufferSize;$W.Height=35;$B.Height=300;$Host.UI.RawUI.WindowSize=$W;$Host.UI.RawUI.BufferSize=$B;}" %nul%
 )
 
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':sppmgr\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':sppmgr\:.*';. ([scriptblock]::Create($f[1]))"
 goto dk_done
 
 :sppmgr:
@@ -25650,7 +25856,7 @@ call :_taskclear-cache
 
 %nul% reg query "HKLM\%SPPk%\%_wApp%" && (
 echo Removing KMS38 protection...
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':regdel\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':regdel\:.*';. ([scriptblock]::Create($f[1]))"
 %nul% reg delete "HKLM\%SPPk%\%_wApp%" /f
 %nul% reg query "HKLM\%SPPk%\%_wApp%" && (
 call :dk_color %Red% "Failed to remove KMS38 protection."
@@ -25688,7 +25894,7 @@ echo Checking SPP permission related issues...
 call :checkperms
 if defined permerror (
 call :dk_color %Red% "[!permerror!]"
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':fixsppperms\:.*';. ([scriptblock]::Create($f[1]))" %nul%
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':fixsppperms\:.*';. ([scriptblock]::Create($f[1]))" %nul%
 call :checkperms
 if defined permerror (
 call :dk_color %Red% "[!permerror!] [Failed To Fix]"
@@ -25758,8 +25964,8 @@ if defined _vis (
 
 echo:
 echo Reinstalling system licenses...
-%psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[System.IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
-if %errorlevel% NEQ 0 %psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[System.IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
+%psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
+if %errorlevel% NEQ 0 %psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
 if %errorlevel% EQU 0 (
 echo [Successful]
 ) else (
@@ -26382,7 +26588,7 @@ exit /b
 
 :regownstart
 
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':regown\:.*';. ([scriptblock]::Create($f[1]));"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':regown\:.*';. ([scriptblock]::Create($f[1]));"
 exit /b
 
 ::  Below code takes ownership of a volatile registry key and deletes it
@@ -26551,7 +26757,7 @@ set _ntarget=
 set _wtarget=
 
 if %winbuild% GEQ 10240 for /f "tokens=4" %%a in ('dism /online /english /Get-TargetEditions ^| findstr /i /c:"Target Edition : "') do (if defined _dtarget (set "_dtarget= !_dtarget! %%a ") else (set "_dtarget= %%a "))
-if %winbuild% LSS 10240 for /f "tokens=4" %%a in ('%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':cbsxml\:.*';. ([scriptblock]::Create($f[1])) -GetTargetEditions;" ^| findstr /i /c:"Target Edition : "') do (if defined _ptarget (set "_ptarget= !_ptarget! %%a ") else (set "_ptarget= %%a "))
+if %winbuild% LSS 10240 for /f "tokens=4" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':cbsxml\:.*';. ([scriptblock]::Create($f[1])) -GetTargetEditions;" ^| findstr /i /c:"Target Edition : "') do (if defined _ptarget (set "_ptarget= !_ptarget! %%a ") else (set "_ptarget= %%a "))
 
 if %winbuild% GEQ 10240 if not exist "%SystemRoot%\Servicing\Packages\Microsoft-Windows-Server*Edition~*.mum" (
 if %winbuild% GEQ 17063 call :ced_edilist
@@ -26759,7 +26965,7 @@ echo:
 call :ced_prep
 if defined preperror goto dk_done
 
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':dismapi\:.*';. ([scriptblock]::Create($f[1])) %targetedition% %key%"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':dismapi\:.*';. ([scriptblock]::Create($f[1])) %targetedition% %key%"
 call :ced_postprep
 )
 %line%
@@ -26797,7 +27003,7 @@ call :ced_prep
 if defined preperror goto dk_done
 
 if %_stg%==0 (set stage=) else (set stage=-StageCurrent)
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':cbsxml\:.*';. ([scriptblock]::Create($f[1])) -SetEdition %targetedition% %stage%"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':cbsxml\:.*';. ([scriptblock]::Create($f[1])) -SetEdition %targetedition% %stage%"
 call :ced_postprep
 %line%
 
@@ -27535,7 +27741,7 @@ cls
 set editedition=
 call :ch_getinfo
 call :oe_tempcleanup
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':getlist\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':getlist\:.*';. ([scriptblock]::Create($f[1]))"
 
 :oe_editionchange
 
@@ -27608,7 +27814,7 @@ cls
 set suites=
 echo %list% | find /i "Suites" %nul1% && (
 set suites=1
-%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':getappnames\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':getappnames\:.*';. ([scriptblock]::Create($f[1]))"
 if not exist %SystemRoot%\Temp\getAppIds.txt (
 %eline%
 echo Failed to generate available apps list.
@@ -27641,6 +27847,11 @@ if defined Lync_st set Lync_st=Off
 set OneDrive_st=Off
 if defined suites (set Teams_st=Off) else (set Teams_st=)
 
+set OutlookForWindows_st=
+if %winbuild% GEQ 19041 if defined Outlook_st echo %targetedition% | find /i "O365" %nul1% && (
+set OutlookForWindows_st=Off
+)
+
 :oe_excludeapps
 
 cls
@@ -27653,19 +27864,20 @@ call :dk_color %Gray% "To exclude the apps listed below from installation, toggl
 if defined editedition call :dk_color %Gray% "Note: The On/Off status below does not reflect the current status of the installed apps."
 %line%
 if defined suites echo:
-if defined Access_st     echo [A] Access           : %Access_st%
-if defined Excel_st      echo [E] Excel            : %Excel_st%
-if defined OneNote_st    echo [N] OneNote          : %OneNote_st%
-if defined Outlook_st    echo [O] Outlook          : %Outlook_st%
-if defined PowerPoint_st echo [P] PowerPoint       : %PowerPoint_st%
-if defined Project_st    echo [J] Project          : %Project_st%
-if defined Publisher_st  echo [R] Publisher        : %Publisher_st%
-if defined Visio_st      echo [V] Visio            : %Visio_st%
-if defined Word_st       echo [W] Word             : %Word_st%
+if defined Access_st            echo [A] Access              : %Access_st%
+if defined Excel_st             echo [E] Excel               : %Excel_st%
+if defined OneNote_st           echo [N] OneNote             : %OneNote_st%
+if defined Outlook_st           echo [O] Outlook ^(Classic^)   : %Outlook_st%
+if defined PowerPoint_st        echo [P] PowerPoint          : %PowerPoint_st%
+if defined Project_st           echo [J] Project             : %Project_st%
+if defined Publisher_st         echo [R] Publisher           : %Publisher_st%
+if defined Visio_st             echo [V] Visio               : %Visio_st%
+if defined Word_st              echo [W] Word                : %Word_st%
 echo:
-if defined Lync_st       echo [L] SkypeForBusiness : %Lync_st%
-if defined OneDrive_st   echo [D] OneDrive         : %OneDrive_st%
-if defined Teams_st      echo [T] Teams            : %Teams_st%
+if defined Lync_st              echo [L] SkypeForBusiness    : %Lync_st%
+if defined OutlookForWindows_st echo [K] Outlook ^(New^)       : %OutlookForWindows_st%
+if defined OneDrive_st          echo [D] OneDrive            : %OneDrive_st%
+if defined Teams_st             echo [T] Teams               : %Teams_st%
 %line%
 echo:
 echo [1] Continue
@@ -27673,22 +27885,23 @@ echo [0] Go Back
 %line%
 echo:
 call :dk_color %_Green% "Choose a menu option using your keyboard:"
-choice /C:AENOPJRVWLDT10 /N
+choice /C:AENOPJRVWLKDT10 /N
 set _el=!errorlevel!
-if !_el!==14 goto :oemenu
-if !_el!==13 call :excludelist & goto :oe_editionchangefinal
-if !_el!==12 if defined Teams_st      (if "%Teams_st%"=="Off"      (set Teams_st=ON)      else (set Teams_st=Off))
-if !_el!==11 if defined OneDrive_st   (if "%OneDrive_st%"=="Off"   (set OneDrive_st=ON)   else (set OneDrive_st=Off))
-if !_el!==10 if defined Lync_st       (if "%Lync_st%"=="Off"       (set Lync_st=ON)       else (set Lync_st=Off))
-if !_el!==9  if defined Word_st       (if "%Word_st%"=="Off"       (set Word_st=ON)       else (set Word_st=Off))
-if !_el!==8  if defined Visio_st      (if "%Visio_st%"=="Off"      (set Visio_st=ON)      else (set Visio_st=Off))
-if !_el!==7  if defined Publisher_st  (if "%Publisher_st%"=="Off"  (set Publisher_st=ON)  else (set Publisher_st=Off))
-if !_el!==6  if defined Project_st    (if "%Project_st%"=="Off"    (set Project_st=ON)    else (set Project_st=Off))
-if !_el!==5  if defined PowerPoint_st (if "%PowerPoint_st%"=="Off" (set PowerPoint_st=ON) else (set PowerPoint_st=Off))
-if !_el!==4  if defined Outlook_st    (if "%Outlook_st%"=="Off"    (set Outlook_st=ON)    else (set Outlook_st=Off))
-if !_el!==3  if defined OneNote_st    (if "%OneNote_st%"=="Off"    (set OneNote_st=ON)    else (set OneNote_st=Off))
-if !_el!==2  if defined Excel_st      (if "%Excel_st%"=="Off"      (set Excel_st=ON)      else (set Excel_st=Off))
-if !_el!==1  if defined Access_st     (if "%Access_st%"=="Off"     (set Access_st=ON)     else (set Access_st=Off))
+if !_el!==15 goto :oemenu
+if !_el!==14 call :excludelist & goto :oe_editionchangefinal
+if !_el!==13 if defined Teams_st             (if "%Teams_st%"=="Off"             (set Teams_st=ON)             else (set Teams_st=Off))
+if !_el!==12 if defined OneDrive_st          (if "%OneDrive_st%"=="Off"          (set OneDrive_st=ON)          else (set OneDrive_st=Off))
+if !_el!==11 if defined OutlookForWindows_st (if "%OutlookForWindows_st%"=="Off" (set OutlookForWindows_st=ON) else (set OutlookForWindows_st=Off))
+if !_el!==10 if defined Lync_st              (if "%Lync_st%"=="Off"              (set Lync_st=ON)              else (set Lync_st=Off))
+if !_el!==9  if defined Word_st              (if "%Word_st%"=="Off"              (set Word_st=ON)              else (set Word_st=Off))
+if !_el!==8  if defined Visio_st             (if "%Visio_st%"=="Off"             (set Visio_st=ON)             else (set Visio_st=Off))
+if !_el!==7  if defined Publisher_st         (if "%Publisher_st%"=="Off"         (set Publisher_st=ON)         else (set Publisher_st=Off))
+if !_el!==6  if defined Project_st           (if "%Project_st%"=="Off"           (set Project_st=ON)           else (set Project_st=Off))
+if !_el!==5  if defined PowerPoint_st        (if "%PowerPoint_st%"=="Off"        (set PowerPoint_st=ON)        else (set PowerPoint_st=Off))
+if !_el!==4  if defined Outlook_st           (if "%Outlook_st%"=="Off"           (set Outlook_st=ON)           else (set Outlook_st=Off))
+if !_el!==3  if defined OneNote_st           (if "%OneNote_st%"=="Off"           (set OneNote_st=ON)           else (set OneNote_st=Off))
+if !_el!==2  if defined Excel_st             (if "%Excel_st%"=="Off"             (set Excel_st=ON)             else (set Excel_st=Off))
+if !_el!==1  if defined Access_st            (if "%Access_st%"=="Off"            (set Access_st=ON)            else (set Access_st=Off))
 goto :oe_excludeapps
 
 :excludelist
@@ -27705,6 +27918,7 @@ publisher
 visio
 word
 lync
+outlookforwindows
 onedrive
 teams
 ) do (
@@ -28085,7 +28299,7 @@ if not defined terminal mode 105, 32
 ::  Get build number for the target FFN, using build number with OfficeC2RClient.exe command to trigger updates provides accurate results
 
 set build=
-for /f "delims=" %%a in ('%psc% "$f=[System.IO.File]::ReadAllText('!_batp!') -split ':getbuild\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (set build=%%a)
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':getbuild\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (set build=%%a)
 echo "%build%" | find /i "16." %nul% || set build=
 
 echo:
